@@ -1,16 +1,12 @@
-# Evidence-Driven Software Evolution Methodology
+# Evidence-Driven Software Evolution
 
-**Version**: 1.0
-**Status**: Specification
-**Developed through**: SIGES Project (SPEC-001, SPEC-002)
+**Version**: 2.0
+**Status**: Architecture (Normative/Recommended/Informative)
+**Developed through**: SIGES Project (SPEC-001 through SPEC-005)
 
 ---
 
-> Every change must answer three questions:
->
-> **Why?**
-> **How do we know?**
-> **Did it improve?**
+> EDSE is a software engineering methodology built upon a conceptual language for describing and governing software evolution.
 
 ---
 
@@ -19,6 +15,8 @@
 A methodology for evolving software systems with evidence, traceability, and architectural control. It governs **how to decide** what to do and **how to prove** it was done right.
 
 Unlike process frameworks (Scrum, Kanban), this methodology focuses on **engineering decisions** — not project management.
+
+EDSE also possesses its own conceptual language defined in the Metamodel.
 
 ## What This Is NOT
 
@@ -47,90 +45,117 @@ Unlike process frameworks (Scrum, Kanban), this methodology focuses on **enginee
 
 ---
 
-## Core Principles
+## Architecture
 
-1. **Research Before Implementation** — Findings before fixes
-2. **Evidence Over Intuition** — Confidence, not just code
-3. **Architectural Guardrails** — Prove new patterns are needed
-4. **Measure First** — Baselines before optimization
-5. **Regression First** — Every change must prove nothing broke
-6. **Baseline Freeze** — Verified states become foundations
-7. **Complete Traceability** — Finding to release, fully linked
-
----
-
-## The Engineering Evidence Cycle
+EDSE is organized in 7 layers:
 
 ```
-Discover → Investigate → Decide → Implement → Validate → Freeze
+Foundations → Conceptual Model → Principles → Processes → Artifacts → Patterns
+                                                                        ↓
+                                                                   Templates
 ```
 
-Each cycle creates a **frozen baseline** — the foundation for the next evolution.
+The **Metamodel** is the formal definition of all entities and relationships. **Reference Architecture** is its visual notation.
 
----
+## Weight Levels
 
-## The Two Layers
-
-### Research Layer (Thinking)
-
-```
-Finding → Research Question → Evidence → Decision
-```
-
-### Engineering Layer (Doing)
-
-```
-SPEC → Tasks → Implementation → Regression → Release
-```
-
-**Every engineering action must be preceded by a research decision.**
-
----
-
-## Quick Start
-
-1. **Find something**: Code inspection, test failure, metric
-2. **Create Finding**: Document what you found
-3. **Research**: Gather evidence, ask questions
-4. **Decide**: Fix, defer, or document
-5. **Implement**: If fixing
-6. **Validate**: Run regression
-7. **Release**: Create new baseline
+| Level | Content | Change Rules |
+|-------|---------|--------------|
+| **Normative** | Foundations, Metamodel, Constraints, Conceptual Model | Governance approval required |
+| **Recommended** | Principles, Processes, Patterns | Evidence from applications |
+| **Informative** | Templates, Artifacts | Free evolution |
 
 ---
 
 ## Documentation Structure
 
-| Document | Purpose |
-|----------|---------|
-| **README.md** | This file — introduction and overview |
-| **SKILL.md** | Normative specification — rules, vocabulary, artifacts |
-| **REFERENCE.md** | Examples, case studies, FAQ |
-| **templates/** | Practical templates for all artifacts |
+```
+v2/
+├── foundations/              # Axioms that never change
+├── metamodel.md             # Formal entity-relationship definition
+├── conceptual-model/        # Entity documentation
+├── constraints.md           # Invariant requirements
+├── principles/              # Methodological rules
+├── processes/               # Behavior patterns
+├── artifacts/               # Documentary representations
+├── patterns/                # Reusable scenarios
+├── templates/               # Minimal structures
+├── reference-architecture.md # Visual notation
+└── governance.md            # Rules for EDSE itself
+```
+
+| Document | Purpose | Weight |
+|----------|---------|--------|
+| **SKILL.md** | Entry point — quick navigation | — |
+| **metamodel.md** | Formal definition of entities and relationships | Normative |
+| **constraints.md** | Invariant requirements (MUST rules) | Normative |
+| **foundations/** | Philosophy, vocabulary, scope | Normative |
+| **conceptual-model/** | Entity documentation | Normative |
+| **principles/** | Methodological rules | Recommended |
+| **processes/** | Assessment, Evolution, Validation, Governance, Baseline | Recommended |
+| **patterns/** | GoF-style reusable scenarios | Recommended |
+| **artifacts/** | Evidence Package, Release Report, etc. | Informative |
+| **templates/** | Minimal structures | Informative |
+| **governance.md** | Rules for EDSE itself | Normative |
+
+---
+
+## Quick Navigation
+
+| I want to... | Go to |
+|--------------|-------|
+| Understand EDSE | `v2/foundations/` |
+| See the metamodel | `v2/metamodel.md` |
+| Learn the entities | `v2/conceptual-model/` |
+| See the constraints | `v2/constraints.md` |
+| See the principles | `v2/principles/` |
+| See the processes | `v2/processes/` |
+| Apply patterns | `v2/patterns/` |
+| Use templates | `v2/templates/` |
+| See the visual model | `v2/reference-architecture.md` |
 
 ---
 
 ## Real-World Results
 
-This methodology was validated through two specifications of the SIGES medical system:
+EDSE was validated through five specifications of the SIGES medical system:
 
-- **85** functional scenarios validated
-- **79** stabilization tasks completed
-- **12** user stories across 4 phases
-- **5** Architecture Decision Records
-- **4** Mermaid architecture diagrams
-- **34** PASS, **11** FAIL (all pre-existing)
-- **100%** endpoints under 0.35s response time
-- Complete traceability from finding to release
+| SPEC | Type | Result |
+|------|------|--------|
+| SPEC-001 | Validation | 85/85 tests PASS |
+| SPEC-002 | Stabilization | 79 tasks, 5 ADRs |
+| SPEC-003 | Architectural Refactoring | 1086→166 lines |
+| SPEC-004 | Dependency Modernization | 88 packages, -81% vulnerabilities |
+| SPEC-005 | Frontend Assessment | 94 tasks, Evidence Package v1.0 |
+
+**Total**: 38 Mermaid diagrams, 11 ADRs, complete traceability from finding to release.
+
+---
+
+## Governance
+
+EDSE applies to itself:
+
+> **Modifications to the Metamodel require evidence obtained from multiple independent applications of EDSE. No change to the conceptual core may be introduced solely by design preference.**
+
+### Version Strategy
+
+| Version | Strategy |
+|---------|----------|
+| EDSE v2.0 | Freeze conceptual architecture. Only minor corrections. |
+| EDSE v2.x | Validate through real applications. Collect evidence. |
+| EDSE v3.0 | Only if evidence justifies. Changes to metamodel. |
 
 ---
 
 ## Learn More
 
-- **SKILL.md**: Complete normative specification
-- **REFERENCE.md**: Real examples from SIGES project
-- **templates/**: Ready-to-use templates
+- **SKILL.md**: Entry point with quick navigation
+- **v2/metamodel.md**: Formal definition of EDSE entities
+- **v2/reference-architecture.md**: Visual notation
+- **v2/governance.md**: Rules for EDSE itself
 
 ---
 
-*Version 1.0 — Developed through evidence, not theory.*
+*Version 2.0 — A methodology with its own conceptual language.*
+*Developed through evidence, not theory.*
