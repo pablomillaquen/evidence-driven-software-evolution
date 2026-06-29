@@ -1,312 +1,532 @@
----
-name: Evidence-Driven Software Evolution
-description: A methodology for evolving software systems with evidence, traceability, and architectural control. Includes vocabulary, evidence levels, finding taxonomy, SPEC types, baseline management, and complete traceability model.
----
+# Evidence-Driven Software Evolution
 
-# Evidence-Driven Software Evolution — Normative Specification
+A methodology for evolving software systems with evidence, traceability, and architectural control. Designed for AI-assisted engineering projects where decisions must be justified, not assumed.
 
-**Version**: 1.2
-**Status**: Specification
-**Type**: Normative (rules must be followed)
+## When to Use
 
----
+- Evolving an existing software system with controlled changes
+- Stabilizing a codebase before adding new features
+- Projects requiring audit trails and architectural decisions
+- Any project where "why" matters as much as "what"
 
-## 1. Vocabulary
+## Core Principles
 
-### 1.1 Core Terms
+### 1. Research Before Implementation
 
-| Term | Definition |
-|------|------------|
-| **Finding** | Observed fact requiring investigation. An anomaly, issue, or opportunity identified through inspection, testing, or measurement. |
-| **Research Question** | Question created to resolve uncertainty about a Finding. Bridges discovery and decision. |
-| **Evidence** | Verifiable proof supporting a claim. Must be reproducible and traceable. |
-| **Decision** | Chosen course of action supported by evidence. May or may not become an ADR. |
-| **ADR** | Architecture Decision Record. A Decision that affects system architecture and will be referenced by future work. |
-| **SPEC** | Specification. A structured document defining what will be done, why, and how it will be validated. |
-| **Baseline** | Frozen, validated system state that becomes the foundation for future work. |
-| **Regression** | Test execution proving that existing functionality remains intact after changes. |
-| **Release** | Official closure of a SPEC, creating a new Baseline. |
-| **Technical Debt** | Documented consequence of a deferred Finding. Not a Finding itself — it is born from one. |
-
-### 1.2 Action Terms
-
-| Term | Definition |
-|------|------------|
-| **Freeze** | Officially marking a Baseline as the reference state for future work. |
-| **Stabilize** | Improving system quality without changing user-facing behavior. |
-| **Validate** | Proving through evidence that a change achieved its intended effect without side effects. |
-| **Defer** | Documenting a Finding for resolution in a future SPEC. |
-| **Close** | Marking a Finding as fully resolved with evidence. |
-
----
-
-## 2. Levels of Evidence
-
-Evidence is classified into six levels, from least to most reliable:
-
-| Level | Name | Description | Example |
-|-------|------|-------------|---------|
-| **E0** | Opinion | Subjective belief without data | "I think this is slow" |
-| **E1** | Code Inspection | Reading code to understand behavior | "Controller has no validation" |
-| **E2** | Static Analysis | Automated code analysis | PHPStan, ESLint results |
-| **E3** | Automated Test | Test execution proving behavior | PHPUnit, Jest results |
-| **E4** | Measured Metric | Quantified before/after comparison | "Response time: 0.3s → 0.1s" |
-| **E5** | Production Observation | Real-world behavior monitoring | APM logs, error rates |
-
-### Rules
-
-1. **Minimum E1** for all Findings (must inspect code)
-2. **Minimum E3** for all code changes (must have tests)
-3. **E4 required** for performance claims
-4. **E0 never qualifies** as evidence (opinion is not evidence)
-
-### Decision Recording
-
-Every Decision must record its Evidence Level:
+Never assume the solution. Every change starts with a finding, not a fix.
 
 ```
-**Evidence Level**: E3
-**Evidence**: PHPUnit test results (34 PASS, 11 FAIL)
-```
-
----
-
-## 3. Finding Taxonomy
-
-Findings are categorized by their nature:
-
-| Category | Description | Examples |
-|----------|-------------|----------|
-| **Functional** | Behavior doesn't match expectations | Wrong status code, missing field |
-| **Architecture** | Structural concerns | Fat controller, missing service |
-| **Performance** | Speed, memory, or query issues | Slow response, N+1 query |
-| **Security** | Vulnerability or exposure | Missing auth, stack trace leak |
-| **Documentation** | Missing or incorrect docs | Undocumented endpoint |
-| **Compliance** | Regulatory or standard gaps | Missing audit trail |
-| **Technical Debt** | Suboptimal implementation | Code duplication, hardcoded values |
-| **Regression** | Broken existing functionality | Test failure after change |
-| **Usability** | User experience issues | Confusing error message |
-
-### Rules
-
-1. Every Finding must have a Category
-2. Category affects severity assessment
-3. Categories enable statistics and prioritization
-
----
-
-## 4. Finding Lifecycle
-
-### States
-
-```
-OPEN → INVESTIGATING → DECISION → IMPLEMENTED → VALIDATED → CLOSED
-```
-
-| State | Description | Entry Criteria |
-|-------|-------------|----------------|
-| **OPEN** | Problem identified | Finding created |
-| **INVESTIGATING** | Research in progress | Research Question created |
-| **DECISION** | Decision made | Decision documented with evidence |
-| **IMPLEMENTED** | Code changed | Commit completed |
-| **VALIDATED** | Regression passed | Tests pass, evidence recorded |
-| **CLOSED** | Fully resolved | All validation complete |
-
-### Resolution Types
-
-| Type | When to Use | Result |
-|------|-------------|--------|
-| **FIXED** | Problem resolved in this SPEC | Finding → CLOSED |
-| **DEFERRED** | Problem documented for future SPEC | Finding → CLOSED + Technical Debt created |
-| **DOCUMENTED** | Problem noted, no action needed | Finding → CLOSED |
-
-### Dual Path
-
-Findings can follow two paths:
-
-**Path A: Implementation**
-
-```
-Finding → Research → Decision → Implementation → Validation → CLOSED
-```
-
-**Path B: Documentation**
-
-```
-Finding → Research → Decision → No implementation → Document → CLOSED
-```
-
-Both paths are valid. Not every Finding requires code changes.
-
----
-
-## 5. Technical Debt Model
-
-### Birth
-
-Technical Debt is born from a deferred Finding:
-
-```
-Finding (DEFERRED)
+Finding (H)
     ↓
-Technical Debt Documented
+Research Question (PI)
     ↓
-Registered in Baseline
+Evidence
     ↓
-Tracked in Future SPEC
+Decision (D)
+    ↓
+Implementation
+    ↓
+Validation
 ```
 
-### Rules
+### 2. Evidence as Requirement
 
-1. Technical Debt never exists alone — it always traces to a Finding
-2. Every Technical Debt entry must include:
-   - Original Finding ID
-   - Why it was deferred
-   - Impact assessment
-   - Suggested future SPEC
-3. Technical Debt is reviewed at each Baseline creation
+Every important claim must be backed by evidence. Not opinion. Not intuition. Not "it feels faster."
 
----
+Evidence types:
+- **Code inspection**: What the code actually does
+- **API execution**: What the system actually returns
+- **Metrics**: Quantified measurements before and after
+- **Regression tests**: Proof that nothing broke
 
-## 6. Decision Model
+### 3. Architectural Guardrails
 
-### Decision vs ADR
+Before creating new components:
+1. Evaluate existing architecture
+2. Justify the need for change
+3. Document the decision
+4. Prefer the simplest path within existing patterns
 
-> **Every ADR is a Decision. Not every Decision deserves an ADR.**
+Rule: "If a improvement can be made within the existing architecture, that alternative must be preferred."
 
-| Criteria | Decision | ADR |
-|----------|----------|-----|
-| Scope | Operational or technical | Architectural |
-| Impact | Localized | System-wide |
-| Duration | May be temporary | Permanent reference |
-| Documentation | Decision template | ADR template |
+### 4. Measure First
 
-### Decision Confidence
+Before optimizing:
+1. Measure current state
+2. Establish baseline
+3. Justify changes with data
+4. Re-measure after changes
 
-| Level | Criteria |
-|-------|----------|
-| **High** | Multiple evidence sources, clear metrics, no ambiguity |
-| **Medium** | Single evidence source, reasonable confidence |
-| **Low** | Limited evidence, assumptions made, needs future validation |
+No optimization without measurement.
 
-### Decision Recording
+### 5. Regression First
 
-```
-## D-XXX: [Title]
+Every change must demonstrate:
+- No functionality broken
+- Compatibility maintained
+- Measurable improvement (if applicable)
 
-**Status**: ACCEPTED / DEFERRED / REJECTED
-**Type**: OPERATIONAL / TECHNICAL / ARCHITECTURAL
-**Confidence**: HIGH / MEDIUM / LOW
-**Evidence Level**: E1 / E2 / E3 / E4 / E5
-**Date**: [Date]
-```
-
----
-
-## 7. SPEC Model
-
-### SPEC Types
-
-| Type | Purpose | Expected Duration |
-|------|---------|-------------------|
-| **Validation** | Verify existing behavior | Short |
-| **Stabilization** | Improve quality without behavior change | Medium |
-| **Refactoring** | Restructure without behavior change | Medium |
-| **Architecture** | Document or establish architectural patterns | Short |
-| **Security** | Address vulnerabilities or compliance | Variable |
-| **Migration** | Move between technologies or data | Long |
-| **Compliance** | Meet regulatory requirements | Variable |
-| **Performance** | Optimize measured metrics | Medium |
-| **Research** | Investigate feasibility or options | Short |
-
-### SPEC Structure
-
-| Document | Required | Purpose |
-|----------|----------|---------|
-| `spec.md` | Yes | What and why (frozen during implementation) |
-| `plan.md` | Yes | How (phases, tasks, traceability) |
-| `research.md` | Yes | Decisions with justification |
-| `data-model.md` | Conditional | Entities affected (if schema changes) |
-| `quickstart.md` | Yes | Validation scenarios |
-| `tasks.md` | Yes | Task list with status |
-| `checklists/` | Yes | Quality gates |
-| `evidence/` | Yes | All proof artifacts |
-
-### SPEC Lifecycle
+### 6. Complete Traceability
 
 ```
-Draft → Research → Planning → Implementation → Validation → Closure
+Finding → Question → Decision → SPEC → Task → Commit → Evidence → Regression → Release
 ```
+
+Every artifact links to the next. Nothing exists in isolation.
+
+### 7. Reverse Traceability
+
+Each finding must be traceable back to:
+- The evidence that supports it
+- The Research Question that originated it
+
+```
+Finding H-XXX
+    ↓
+Supported by
+    Evidence E-XXX
+    ↓
+Originated from
+    RQ-XXX
+```
+
+This enables auditing decisions back to evidence.
+
+### 8. Knowledge Management
+
+Each version generates:
+- ADRs (Architecture Decision Records)
+- Documentation
+- Release Report
+- Registered technical debt
+- Updated roadmap
+
+## Evidence Package
+
+The primary deliverable of an EDSE investigation is the **Evidence Package** — a complete, reproducible investigation.
+
+### Structure
+
+```
+evidence/
+├── environment/
+│   ├── project-metadata.json
+│   └── environment-validation.md
+├── architecture/
+│   ├── module-inventory.md
+│   ├── component-hierarchy.md
+│   ├── routing-map.md
+│   ├── service-layer.md
+│   ├── state-management.md
+│   └── architectural-patterns.md
+├── technology/
+│   ├── dependency-inventory.md
+│   ├── outdated-packages.txt
+│   ├── security-audit.txt
+│   ├── health-classification.md
+│   └── deprecated-packages.md
+├── quality/
+│   ├── code-patterns.md
+│   ├── anti-patterns.md
+│   ├── deprecated-practices.md
+│   ├── findings.md
+│   └── technical-debt-register.md
+├── testing/
+│   ├── test-execution-report.md
+│   ├── coverage-analysis.md
+│   ├── testing-gaps.md
+│   └── smoke-test-results.md
+├── performance/
+│   ├── bundle-analysis.md
+│   ├── load-times.md
+│   ├── performance-characteristics.md
+│   └── baseline-metrics.md
+├── consolidated/
+│   ├── findings-summary.md
+│   ├── candidate-decision-inputs.md
+│   ├── candidate-decisions.md
+│   ├── decision-criteria.md
+│   ├── priority-classification.md
+│   └── reverse-traceability.md
+├── baseline/
+│   ├── baseline-snapshot.md
+│   ├── package-lock.json
+│   └── configuration-state.json
+└── final.md
+```
+
+### Purpose
+
+If someone asks "why did you modernize the frontend?", the answer is not "because the code was old" — it is the full chain: RQ → Evidence → Finding → Candidate Decision → Accepted Decision → Future SPEC.
+
+## Specification Lifecycle
+
+### Structure
+
+A SPEC contains:
+
+| Document | Purpose |
+|----------|---------|
+| `spec.md` | What and why (frozen during implementation) |
+| `plan.md` | How (phases, tasks, traceability) |
+| `research.md` | Research Protocol (questions, not conclusions) |
+| `data-model.md` | Entities affected |
+| `execution-guide.md` | Validation scenarios |
+| `tasks.md` | Task list with status |
+| `checklists/` | Quality gates |
+| `evidence/` | Evidence Package |
+
+### Phases
+
+1. **Research**: Understand current state, identify findings
+2. **Planning**: Define scope, phases, tasks
+3. **Implementation**: One user story at a time, full cycle per US
+4. **Validation**: Regression after each change
+5. **Closure**: Final regression, release report, tag
 
 ### Frozen State
 
 During implementation, `spec.md`, `plan.md`, `research.md`, and `tasks.md` are frozen. Unexpected behavior → register Finding, evaluate, defer if scope change.
 
----
+## Research Protocol vs Research Report
 
-## 8. Baseline Model
+### Research Protocol (Before Investigation)
 
-### Components
+Contains only:
+- Research Question
+- Motivation
+- Investigation Strategy
+- Evidence Required
+- Success Condition
 
-| Component | Required | Description |
-|-----------|----------|-------------|
-| Version | Yes | Semantic version with status tag |
-| Regression | Yes | Test results (PASS/FAIL) |
-| Functional State | Yes | What works and how |
-| Performance | Conditional | Metrics if measured |
-| Technical Debt | Yes | What was deferred |
-| ADRs | Yes | Architectural decisions made |
-| Documentation | Yes | What was generated |
+Does NOT contain:
+- Findings
+- Conclusions
+- Decisions
 
-### Freeze Cycle
+### Research Report (After Investigation)
+
+Contains:
+- Findings with severity and confidence
+- Evidence supporting findings
+- Candidate decisions
+- Accepted decisions
+
+## Finding Model
+
+### Format
 
 ```
-Validated Baseline
+## H-XXX: [Title]
+
+**Severity**: HIGH / MEDIUM / LOW
+**Confidence**: HIGH / MEDIUM / LOW
+**Discovered**: [Date]
+**Phase**: [Which phase found it]
+
+### Description
+[What was found]
+
+### Impact
+[What it means for the system]
+
+### Resolution
+[How it was addressed: FIXED / DEFERRED / DOCUMENTED]
+
+### Evidence
+[Links to proof]
+```
+
+### Confidence
+
+Confidence indicates the strength of evidence:
+- **High**: Strong evidence, clear link to Research Question
+- **Medium**: Moderate evidence, reasonable inference
+- **Low**: Weak evidence, requires further investigation
+
+### Lifecycle
+
+1. **Discovery**: Found during inspection or testing
+2. **Classification**: Severity and confidence assessment
+3. **Research**: Investigation if not obvious
+4. **Decision**: Fix, defer, or document
+5. **Implementation**: If fixing
+6. **Validation**: Regression proof
+7. **Closure**: Final status recorded
+
+## Candidate Decisions
+
+Candidate Decisions are an independent artifact between Evidence and Accepted Decisions.
+
+### Purpose
+
+Prevent mixing observations with solutions. The baseline does NOT propose changes — it presents evidence and identifies decisions that should be made.
+
+### Flow
+
+```
+Evidence
     ↓
-Freeze (tag version)
+Findings
     ↓
-New SPEC (starts from frozen baseline)
+Candidate Decision Inputs
     ↓
-Implementation
+Candidate Decisions (P1, P2, P3)
     ↓
-Regression (verify no breakage)
+Accepted Decisions
     ↓
-Release Report
-    ↓
-New Frozen Baseline
+Baseline Freeze
+```
+
+### Format
+
+```
+## D-XXX: [Decision Title]
+
+**Status**: PENDING / ACCEPTED / DEFERRED / REJECTED
+**Priority**: P1 (Must-decide) / P2 (Should-decide) / P3 (Could-decide)
+**Date**: [When decided]
+**Context**: [What situation required this decision]
+
+### Decision
+[What was decided]
+
+### Justification
+[Why this decision, with evidence]
+
+### Consequences
+[What this means going forward]
+
+### Related
+- Finding: H-XXX
+- Research: PI-XXX
+- ADR: ADR-XXX (if architectural)
+```
+
+## Decision Preparation Phase
+
+A standard phase in assessment SPECs that transforms findings into candidate decisions.
+
+### Purpose
+
+Prevents jumping from evidence directly to solutions. Ensures decisions are evidence-based and properly prioritized.
+
+### Activities
+
+1. Review all findings
+2. Identify findings requiring decisions
+3. Prepare candidate decision inputs
+4. Classify decisions by priority
+5. Document decision rationale
+
+## Baseline Freeze
+
+### Definition
+
+Baseline Freeze captures the state of a system at a specific point in time, creating a reference point for all future evolution.
+
+### Criteria
+
+Before freezing, verify:
+- [ ] All evidence packages are complete
+- [ ] All findings are documented
+- [ ] Consolidated Assessment Report is accurate
+- [ ] All candidate decisions are accepted or deferred
+- [ ] Baseline snapshot is created
+- [ ] Configuration state is captured
+
+### What is Frozen
+
+- Evidence Package
+- Findings with severity and confidence
+- Candidate Decisions (accepted or deferred)
+- Technology Health Report
+- Baseline snapshot (package-lock.json, configuration-state.json)
+
+### What is NOT Frozen
+
+- Permanent documentation (separate deliverable)
+- Implementation decisions (future SPECs)
+- New features (future SPECs)
+
+## Research Question Model
+
+### When to Use
+
+When a finding requires investigation before a decision can be made.
+
+### Format
+
+```
+## PI-XXX: [Question]
+
+**Finding**: H-XXX
+**Context**: [Why this needs investigation]
+**Options**: [What we considered]
+**Evidence**: [What we found]
+**Decision**: [What we chose and why]
 ```
 
 ### Rules
 
-1. Every Baseline must have a Git tag
-2. Every Baseline must include regression results
-3. Every Baseline must list Technical Debt
-4. Baselines are immutable once frozen
+- Never skip research for non-trivial changes
+- Always document options considered
+- Decision must reference evidence
+- Research feeds into ADRs when architectural
 
----
+## Decision Model
 
-## 9. Traceability Model
-
-### Chain
+### Format
 
 ```
-US → Decision → Task → Commit → Evidence → Regression → Finding → CLOSED
+## D-XXX: [Decision Title]
+
+**Status**: ACCEPTED / DEFERRED / REJECTED
+**Date**: [When decided]
+**Context**: [What situation required this decision]
+
+### Decision
+[What was decided]
+
+### Justification
+[Why this decision, with evidence]
+
+### Consequences
+[What this means going forward]
+
+### Related
+- Finding: H-XXX
+- Research: PI-XXX
+- ADR: ADR-XXX (if architectural)
 ```
 
-### Required Links
+## Architecture Decision Records (ADR)
 
-| From | To | Required |
-|------|----|----------|
-| Finding | Research Question | Yes (if investigated) |
-| Research Question | Decision | Yes |
-| Decision | ADR | If architectural |
-| Decision | Tasks | Yes (if implemented) |
-| Tasks | Commit | Yes |
-| Commit | Evidence | Yes |
-| Evidence | Regression | Yes |
-| Regression | Finding | If new Finding discovered |
+### When to Create
 
-### Tracking Format
+When a decision:
+- Affects system architecture
+- Will be referenced by future work
+- Needs to survive team changes
+- Involves trade-offs
+
+### Format
+
+```markdown
+# ADR-XXX: [Title]
+
+**Status**: Accepted
+**Date**: [Date]
+**Deciders**: [Who was involved]
+
+## Context
+
+[What is the issue that motivates this decision?]
+
+## Decision
+
+[What is the change being proposed or decided?]
+
+## Consequences
+
+### Positive
+- [Benefits]
+
+### Negative
+- [Trade-offs]
+
+### Neutral
+- [Things to be aware of]
+
+## Alternatives Considered
+
+### [Option A]
+[Description]
+[Why not chosen]
+
+### [Option B]
+[Description]
+[Why not chosen]
+```
+
+### Naming Convention
+
+`docs/adr/NNN-short-title.md`
+
+Examples:
+- `001-authentication-strategy.md`
+- `002-exception-handling.md`
+- `003-logging-strategy.md`
+
+## Evidence Model
+
+### Directory Structure
+
+```
+evidence/
+├── regression/           # Test results per phase
+│   ├── baseline.md
+│   ├── phase1-us01.md
+│   └── final.md
+├── phase1/              # Phase-specific evidence
+│   ├── audit-before.md
+│   └── audit-after.md
+├── phase2/
+│   └── ...
+└── phase3/
+    └── ...
+```
+
+### Evidence Types
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| Audit | Document current state | "44 controllers, 0 with validation" |
+| Test | Prove functionality works | curl output, test results |
+| Metric | Quantified measurement | Response times, query counts |
+| Comparison | Before/after proof | "Was 0.5s, now 0.2s" |
+| Regression | Nothing broke | Test suite results |
+
+### Rules
+
+1. Every finding must have evidence
+2. Every decision must reference evidence
+3. Evidence is stored in the SPEC's evidence directory
+4. Evidence is never deleted (audit trail)
+
+## Traceability Model
+
+### Forward Traceability
+
+```
+Research Question
+    ↓
+Assessment Goal
+    ↓
+Evidence
+    ↓
+Finding
+    ↓
+Candidate Decision
+    ↓
+Accepted Decision
+    ↓
+Baseline Freeze
+```
+
+### Reverse Traceability
+
+```
+Finding H-XXX
+    ↓
+Supported by
+    Evidence E-XXX
+    ↓
+Originated from
+    RQ-XXX
+```
+
+### Tracking
 
 In `tasks.md`:
 
@@ -322,9 +542,7 @@ In `plan.md`:
 | US01 | T001-T005 | abc123 | evidence/... | 35 PASS | H-001 | ✅ |
 ```
 
----
-
-## 10. Regression Model
+## Regression Model
 
 ### When to Run
 
@@ -333,9 +551,27 @@ In `plan.md`:
 3. **Before release**: Complete regression
 4. **When unexpected behavior**: Targeted regression
 
-### Baseline Comparison
+### Process
 
-Always compare to previous Baseline:
+```bash
+# 1. Run tests
+cd api && php artisan test  # (or equivalent)
+
+# 2. Record results
+# PASS / FAIL counts
+# Compare to baseline
+
+# 3. If new FAIL: investigate
+# If H-xxx: register finding
+# If regression: fix immediately
+
+# 4. Update evidence
+# evidence/regression/phaseX-usY.md
+```
+
+### Baseline
+
+Always maintain a regression baseline:
 
 | Version | PASS | FAIL | Notes |
 |---------|------|------|-------|
@@ -345,36 +581,44 @@ Always compare to previous Baseline:
 
 ### Rules
 
-1. Never merge with new regressions
-2. Flaky tests must be identified and documented
-3. Pre-existing failures are tracked separately
-4. Regression results are part of Baseline
+- Never merge with new regressions
+- Flaky tests must be identified and documented
+- Pre-existing failures are tracked separately
+- Regression results are part of release evidence
 
----
+## Release Management
 
-## 11. Release Model
+### Release Report Structure
 
-### Release Report
+```markdown
+# Release Report — vX.Y.Z
 
-The Release Report officially closes a SPEC and creates a new Baseline.
+**Version**: vX.Y.Z
+**Date**: [Date]
+**Status**: Released
 
+## 1. Executive Summary
+## 2. Objectives
+## 3. Scope (Included / Not Included)
+## 4. Work Completed (by phase)
+## 5. Metrics (regression + performance)
+## 6. Findings (closed + deferred)
+## 7. Architectural Decisions (ADRs)
+## 8. Architecture Assets (docs + diagrams)
+## 9. Known Technical Debt
+## 10. Risks
+## 11. Lessons Learned
+## 12. Next Roadmap
+## 13. Release Approval
 ```
-SPEC → Tasks → Evidence → Regression → Release Report → Frozen Baseline
-```
 
-### Required Sections
+### Naming
 
-| Section | Required |
-|---------|----------|
-| Executive Summary | Yes |
-| Objectives | Yes |
-| Scope | Yes |
-| Work Completed | Yes |
-| Metrics | Yes |
-| Findings | Yes |
-| ADRs | Yes |
-| Technical Debt | Yes |
-| Baseline | Yes |
+`docs/releases/vX.Y.Z-[status].md`
+
+Examples:
+- `v1.0.0-validated.md`
+- `v1.1.0-stabilized.md`
 
 ### Tagging
 
@@ -382,42 +626,7 @@ SPEC → Tasks → Evidence → Regression → Release Report → Frozen Baselin
 git tag -a vX.Y.Z-[status] -m "Release description"
 ```
 
----
-
-## 12. Metrics
-
-### Engineering Metrics
-
-| Metric | Description |
-|--------|-------------|
-| Traceability Completeness | % of changes with full traceability chain |
-| Regression Coverage | % of features covered by regression tests |
-| Evidence Coverage | % of decisions backed by evidence (min E1) |
-| Evidence Level Average | Average evidence level across decisions |
-| Finding Closure Rate | % of Findings resolved (not deferred) |
-| Technical Debt Ratio | Deferred Findings / Total Findings |
-
-### Project Metrics
-
-| Metric | Description |
-|--------|-------------|
-| SPEC Completion | % of SPECs completed successfully |
-| Baseline Stability | Consecutive releases without regression |
-| Duration | Time from SPEC start to Baseline |
-| Tasks Completed | Total tasks implemented |
-| Scope Changes | Findings that changed SPEC scope |
-| Commits | Total commits in SPEC |
-| Files Modified | Total files changed |
-
-### Rules
-
-1. Metrics are recorded at each Baseline
-2. Metrics are compared between Baselines
-3. Trends are more important than absolute values
-
----
-
-## 13. Documentation Architecture
+## Documentation Architecture
 
 ### Required per SPEC
 
@@ -437,311 +646,98 @@ Architecture docs should include:
 - **ER diagram**: Data model
 - **Deployment diagram**: Infrastructure
 
----
+## Roadmap Evolution
 
-## 14. Health Report Model
+### Process
 
-### Purpose
-
-The Health Report communicates **the current state of the system** to clients, management, or audits. While Evidence demonstrates **what was done**, the Health Report communicates **what the system looks like now**.
-
-### Health Report as EDSE Artifact
-
-**Name**: System Health Artifact (or Operational Health Report)
-
-**Reusable Domains**:
-- Dependency Health
-- Security Health
-- Architecture Health
-- Test Health
-- API Health
-- Documentation Health
-- Maintainability Health
-- Performance Health
-
-### Health Report Structure
-
-| Component | Required | Description |
-|-----------|----------|-------------|
-| **Dimensions** | Yes | Individual assessments per domain (primary information) |
-| **Overall Assessment** | Yes | Visual summary of dimensions |
-| **Gating Rules** | Yes | Minimum criteria that override numeric assessment |
-| **Baseline Comparison** | Yes | Before/after metrics |
-| **Trend** | Conditional | Historical comparison across versions |
-| **Accepted Debt** | Yes | Documented technical debt with justification |
-
-### Health Dimensions
-
-Each Health Report contains dimension indicators:
-
-| Dimension | Weight | Description |
-|-----------|--------|-------------|
-| Security | 35% | Vulnerability status |
-| Regression Stability | 25% | Test baseline maintenance |
-| Compatibility | 20% | Dependency compatibility |
-| Freshness | 10% | Dependency currency |
-| Maintainability | 10% | Code quality indicators |
-
-### Gating Rules
-
-Gating rules override numeric assessment:
-
-```
-IF Critical CVE exists THEN Overall Status = "At Risk"
-IF regression ≠ baseline THEN Overall Status = "At Risk"
-```
-
-This prevents high scores from masking critical issues.
-
-### Rules
-
-1. Every Health Report must have Dimensions
-2. Every Health Report must have Gating Rules
-3. Every Health Report must include Baseline Comparison
-4. Dimensions are the primary information; Overall Assessment is summary
-5. Health Reports are repeatable across SPECs (same formulas)
-
----
-
-## 15. Health Metrics Model
-
-### Purpose
-
-Health Metrics define calculation formulas for Health Dimensions, making Health Reports repeatable and comparable across SPECs.
-
-### Document Location
-
-`docs/platform/health-metrics.md` (permanent, reusable across SPECs)
-
-### Metric Structure
-
-```markdown
-## Security Dimension
-
-**Formula**: 
-- 100 = 0 Critical + 0 High CVEs
-- 90 = 0 Critical + 1 High CVE
-- 70 = 1 Critical CVE
-- 50 = 2+ Critical CVEs
-
-**Weight**: 35%
-```
-
-### Finding Types for Health Reports
-
-| Type | Description | Examples |
-|------|-------------|----------|
-| **Security** | Vulnerability findings | CVE, missing auth |
-| **Compatibility** | Breaking changes | API changes, deprecations |
-| **Maintenance** | Unmaintained packages | Abandoned dependencies |
-| **Governance** | Process gaps | Missing reviews, deferred debt |
-| **Performance** | Speed/regression | Response time degradation |
-| **Documentation** | Missing docs | Undocumented changes |
-
-### Rules
-
-1. Metrics must be defined before generating Health Reports
-2. Metrics must be documented in `health-metrics.md`
-3. Same metrics must be used across SPECs for comparability
-4. Finding Types enable aggregate analysis across Health Reports
-
----
-
-## 16. Accepted Technical Debt Model
-
-### Purpose
-
-Accepted Technical Debt is distinct from Deferred Debt. It represents **conscious decisions to accept risk** with documented justification and deadline.
-
-### Distinction
-
-| Concept | When Created | Purpose |
-|---------|--------------|---------|
-| **Deferred Debt** | Finding deferred to future SPEC | Will be resolved later |
-| **Accepted Debt** | Decision to accept risk | Will NOT be resolved unless conditions change |
-
-### Accepted Debt Structure
-
-```markdown
-## ATD-XXX: [Package Name]
-
-**Reason**: Why the update is deferred
-**Risk Acceptance**: What risk is accepted
-**Deadline**: When this debt must be revisited
-**Justification**: Business/technical justification
-**Owner**: Who accepted this debt
-```
+1. **After each SPEC**: Review findings, update roadmap
+2. **Identify orthogonal work**: Some specs can run in parallel
+3. **Order by dependency**: Foundational work first
+4. **Document rationale**: Why this order
 
 ### Example
 
-```markdown
-## ATD-001: dompdf/dompdf
-
-**Reason**: Updating to v2.x breaks Laravel integration
-**Risk Acceptance**: PDF generation may have rendering differences
-**Deadline**: Q4 2026 (before Laravel 12 upgrade)
-**Justification**: Current version works; upgrade not critical for operations
-**Owner**: Tech Lead
+```
+SPEC-001 (Validation)
+    ↓
+SPEC-002 (Stabilization)
+    ↓
+├──────────────┐
+▼              ▼
+SPEC-011      SPEC-010
+(Refactor)    (Security)
+    │              │
+    └──────┬───────┘
+           ▼
+    Future Evolution
 ```
 
-### Rules
+## Anti-Patterns
 
-1. Accepted Debt must have a Deadline
-2. Accepted Debt must have a Justification
-3. Accepted Debt must have an Owner
-4. Accepted Debt is reviewed at each Baseline creation
-5. Accepted Debt appears in Health Reports
+### Don't
 
----
+- ❌ Optimize without measuring
+- ❌ Refactor without evidence of need
+- ❌ Skip regression testing
+- ❌ Make decisions based on opinion
+- ❌ Create new patterns when existing ones work
+- ❌ Forget to document why something was NOT done
+- ❌ Mix Research Protocol with Research Report
+- ❌ Jump from Evidence to Accepted Decisions (use Candidate Decisions)
 
-## 17. Governance Feedback Model
+### Do
 
-### Purpose
-
-The Health Report is not the end of the cycle. It is the **generator of the next iteration**. Governance Feedback closes the loop between system state and future investigation.
-
-### The Complete EDSE Cycle
-
-```
-Question
-    ↓
-Investigation
-    ↓
-Findings
-    ↓
-Decisions
-    ↓
-Implementation
-    ↓
-Evidence
-    ↓
-Health Report (State of the System)
-    ↓
-Governance Feedback (New Questions)
-    ↓
-Next Iteration
-```
-
-### How Governance Feedback Works
-
-1. **Health Report identifies weakness** (e.g., Maintainability = 58)
-2. **New Research Question born** (e.g., "Why is maintainability low?")
-3. **New Finding registered** (e.g., H-031: Maintainability below threshold)
-4. **New SPEC created** (e.g., SPEC-009: Maintainability improvement)
-5. **Cycle repeats**
-
-### Example Flow
-
-```
-Health Report: Maintainability = 58
-    ↓
-PI-031: Why is maintainability low?
-    ↓
-H-031: Controllers exceed complexity threshold
-    ↓
-D-031: Extract services from controllers
-    ↓
-SPEC-009: Controller decomposition
-    ↓
-Evidence: Reduced complexity
-    ↓
-Health Report: Maintainability = 82
-    ↓
-Governance Feedback: Continue monitoring
-```
-
-### Rules
-
-1. Every Health Report must be reviewed for Governance Feedback
-2. Low dimensions (< 70) automatically generate Research Questions
-3. Governance Feedback is documented in `research.md`
-4. The cycle never truly ends — it evolves continuously
-
----
-
-## 18. Anti-Patterns
-
-### Never
-
-- ❌ Optimize without measuring (violates Measure First)
-- ❌ Refactor without evidence of need (violates Evidence Over Intuition)
-- ❌ Skip regression testing (violates Regression First)
-- ❌ Make decisions based on E0 evidence (violates Evidence Levels)
-- ❌ Create new patterns when existing ones work (violates Guardrails)
-- ❌ Forget to document why something was NOT done (violates Traceability)
-- ❌ Allow Technical Debt without a Finding (violates Debt Model)
-- ❌ Generate Health Report without Gating Rules (violates Health Report Model)
-- ❌ Accept Technical Debt without Deadline (violates Accepted Debt Model)
-- ❌ Use different Health Metrics across SPECs (violates comparability)
-- ❌ Treat Health Report as final deliverable (violates Governance Feedback)
-
-### Always
-
-- ✅ Measure before and after (E4 required for performance)
-- ✅ Document Findings with evidence (min E1)
+- ✅ Measure before and after
+- ✅ Document findings with evidence
 - ✅ Run regression after every change
 - ✅ Justify decisions with data
 - ✅ Prefer existing architecture
 - ✅ Record deferred work with rationale
-- ✅ Link every artifact in the traceability chain
-- ✅ Include Gating Rules in Health Reports
-- ✅ Document Accepted Technical Debt with justification
-- ✅ Use consistent Health Metrics across SPECs
-- ✅ Generate new Research Questions from Health Report weaknesses
+- ✅ Separate Protocol from Report
+- ✅ Use Candidate Decisions as intermediate step
 
----
+## Quick Reference
 
-## 19. Quick Reference
-
-### The Three Questions
-
-```
-Why?            → Finding + Research + Decision
-How do we know? → Evidence + Metrics (min E1)
-Did it improve? → Regression + Comparison + Health Report
-```
-
-### The Complete EDSE Cycle
-
-```
-Question → Investigation → Findings → Decisions → Implementation → Evidence → Health Report → Governance Feedback → Next Question
-```
-
-### Engineering Evidence Cycle
-
-```
-Discover → Investigate → Decide → Implement → Validate → Report → Feedback
-```
-
-### Baseline Freeze
-
-```
-Baseline → Freeze → SPEC → Evidence → Regression → Health Report → Governance Feedback → Release → Freeze → Next SPEC
-```
-
-### Finding Resolution Flow
+### Finding → Decision Flow
 
 ```
 Found something?
     ↓
 Is it a problem? → No → Document and move on
     ↓ Yes
-Does it need research? → No → Decide directly
+Can you fix it now? → No → Register Finding, defer
+    ↓ Yes
+Does it need research? → No → Implement, validate
     ↓ Yes
 Create Research Question
     ↓
-Gather Evidence (min E1)
+Gather Evidence
     ↓
-Make Decision (record Confidence)
+Make Decision
     ↓
-Implement? → Yes → Code → Validate → CLOSED
-    ↓ No
-Document → Create Technical Debt → CLOSED
+Implement
+    ↓
+Validate (regression)
+    ↓
+Close Finding
+```
+
+### Per-User-Story Cycle
+
+```
+1. Audit current state
+2. Implement changes
+3. Verify with tests/curl
+4. Run regression
+5. Record evidence
+6. Register findings (if any)
+7. Commit
+8. Move to next US
 ```
 
 ---
 
-*Version 1.2 — Normative Specification*
-*This document defines the rules that must be followed when applying the methodology.*
-*Changes in v1.1: Added Health Report Model, Health Metrics Model, Accepted Technical Debt Model.*
-*Changes in v1.2: Added Governance Feedback Model (complete cycle).*
+*This methodology was developed through SPEC-001 and SPEC-002 of the SIGES project.*
+*It was validated through SPEC-005 (Frontend Assessment) across two technological contexts.*
+*It combines Software Engineering, Applied Research, and Architectural Governance.*
+*Reusable across projects where evidence-based evolution is required.*
