@@ -38,22 +38,21 @@ The Metamodel is the formal definition of all entities and relationships. Refere
 
 | I want to... | Go to |
 |--------------|-------|
-| Understand EDSE | `v3/EDSE-v3.0.md` |
-| See the metamodel | `v3/metamodel.md` |
-| Learn the entities | `v3/conceptual-model/` |
-| See the constraints | `v3/constraints.md` |
-| See the principles | `v3/principles/` |
-| See the processes | `v3/processes/` |
-| View deliverables | `v3/artifacts/` |
-| Apply patterns | `v3/patterns/` |
-| Use templates | `v3/templates/` |
-| See the visual model | `v3/reference-architecture.md` |
-| See governance rules | `v3/governance.md` |
+| Understand EDSE | `v2/foundations/` |
+| See the metamodel | `v2/metamodel.md` |
+| Learn the entities | `v2/conceptual-model/` |
+| See the constraints | `v2/constraints.md` |
+| See the principles | `v2/principles/` |
+| See the processes | `v2/processes/` |
+| View deliverables | `v2/artifacts/` |
+| Apply patterns | `v2/patterns/` |
+| Use templates | `v2/templates/` |
+| See the visual model | `v2/reference-architecture.md` |
+| See governance rules | `v2/governance.md` |
 
 ## Versions
 
 | Version | Status | Purpose |
 |---------|--------|---------|
 | `v1/` | Reference | Historical documentation |
-| `v2/` | Reference | Layered architecture |
-| `v3/` | Current | Execution Cycle, Evidence Gates, Implementation Strategy |
+| `v2/` | Current | Layered architecture |
